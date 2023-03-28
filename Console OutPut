@@ -1,0 +1,226 @@
+Started by user admin
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/lib/jenkins/workspace/1
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (SCM Checkout)
+[Pipeline] git
+The recommended git tool is: NONE
+Warning: CredentialId "git-hub" could not be found.
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/1/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/vinaykumarmanne/my-app.git # timeout=10
+Fetching upstream changes from https://github.com/vinaykumarmanne/my-app.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.39.2'
+ > git fetch --tags --force --progress -- https://github.com/vinaykumarmanne/my-app.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+Checking out Revision c8a8cb186847e2a35d376e1aca6b450dda8ed60b (refs/remotes/origin/master)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f c8a8cb186847e2a35d376e1aca6b450dda8ed60b # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D master # timeout=10
+ > git checkout -b master c8a8cb186847e2a35d376e1aca6b450dda8ed60b # timeout=10
+Commit message: "Update Dockerfile"
+ > git rev-list --no-walk c8a8cb186847e2a35d376e1aca6b450dda8ed60b # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Mvn Package)
+[Pipeline] tool
+[Pipeline] sh
++ /opt/maven/bin/mvn clean package
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< in.javahome:mynewapp >------------------------
+[INFO] Building mynewapp 0.0.2
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ mynewapp ---
+[INFO] Deleting /var/lib/jenkins/workspace/1/target
+[INFO] 
+[INFO] --- resources:3.3.0:resources (default-resources) @ mynewapp ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /var/lib/jenkins/workspace/1/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.10.1:compile (default-compile) @ mynewapp ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 1 source file to /var/lib/jenkins/workspace/1/target/classes
+[INFO] 
+[INFO] --- resources:3.3.0:testResources (default-testResources) @ mynewapp ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /var/lib/jenkins/workspace/1/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.10.1:testCompile (default-testCompile) @ mynewapp ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 1 source file to /var/lib/jenkins/workspace/1/target/test-classes
+[INFO] 
+[INFO] --- surefire:3.0.0:test (default-test) @ mynewapp ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junit.JUnit3Provider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running in.javahome.myweb.controller.CalculatorTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.1 s - in in.javahome.myweb.controller.CalculatorTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- war:3.3.2:war (default-war) @ mynewapp ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [mynewapp] in [/var/lib/jenkins/workspace/1/target/mynewapp-0.0.2]
+[INFO] Processing war project
+[INFO] Copying webapp resources [/var/lib/jenkins/workspace/1/src/main/webapp]
+[INFO] Building war: /var/lib/jenkins/workspace/1/target/mynewapp-0.0.2.war
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  8.888 s
+[INFO] Finished at: 2023-03-28T19:55:21Z
+[INFO] ------------------------------------------------------------------------
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build Docker Image)
+[Pipeline] sh
++ docker build -t chinnachowdary/project1:1.0.0 .
+Sending build context to Docker daemon   43.1MB
+
+Step 1/5 : FROM tomcat:latest
+ ---> 608294908754
+Step 2/5 : EXPOSE 8080
+ ---> Using cache
+ ---> 991e6388a916
+Step 3/5 : RUN rm -frv /usr/local/tomcat/webapps/*
+ ---> Using cache
+ ---> 6e70cb4110da
+Step 4/5 : ADD target/*.war /usr/local/tomcat/webapps/
+ ---> c1b4e4680c3b
+Step 5/5 : CMD ["catalina.sh", "run"]
+ ---> Running in 600d2aec037b
+Removing intermediate container 600d2aec037b
+ ---> a2df1321ee35
+Successfully built a2df1321ee35
+Successfully tagged chinnachowdary/project1:1.0.0
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Push Docker Image)
+[Pipeline] withCredentials
+Masking supported pattern matches of $dockerHubPwd
+[Pipeline] {
+[Pipeline] sh
+Warning: A secret was passed to "sh" using Groovy String interpolation, which is insecure.
+		 Affected argument(s) used the following variable(s): [dockerHubPwd]
+		 See https://jenkins.io/redirect/groovy-string-interpolation for details.
++ docker login -u chinnachowdary -p ****
+WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+WARNING! Your password will be stored unencrypted in /var/lib/jenkins/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] sh
++ docker push chinnachowdary/project1:1.0.0
+The push refers to repository [docker.io/chinnachowdary/project1]
+34f6d13172ee: Preparing
+34fa941837a6: Preparing
+51855650441a: Preparing
+509ce21d6674: Preparing
+47a0b225116f: Preparing
+c6813289044b: Preparing
+f3a12c51479f: Preparing
+b93c1bd012ab: Preparing
+c6813289044b: Waiting
+f3a12c51479f: Waiting
+b93c1bd012ab: Waiting
+51855650441a: Layer already exists
+47a0b225116f: Layer already exists
+509ce21d6674: Layer already exists
+34fa941837a6: Layer already exists
+b93c1bd012ab: Layer already exists
+f3a12c51479f: Layer already exists
+c6813289044b: Layer already exists
+34f6d13172ee: Pushed
+1.0.0: digest: sha256:942b3cd87a825c7c964ca286b8514f1ea3a72fa887f107219edf7f8dceef57d8 size: 2000
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Run Container on Dev Server)
+[Pipeline] sshagent
+[ssh-agent] Using credentials vinay (vinay)
+[ssh-agent] Looking for ssh-agent implementation...
+[ssh-agent]   Exec ssh-agent (binary ssh-agent on a remote machine)
+$ ssh-agent
+SSH_AUTH_SOCK=/tmp/ssh-4UcqexQ8pjOF/agent.19424
+SSH_AGENT_PID=19427
+Running ssh-add (command line suppressed)
+Identity added: /var/lib/jenkins/workspace/1@tmp/private_key_4108788490735104244.key (/var/lib/jenkins/workspace/1@tmp/private_key_4108788490735104244.key)
+[ssh-agent] Started.
+[Pipeline] {
+[Pipeline] sh
++ ssh -o StrictHostKeyChecking=no vinay@172.31.43.252 docker run -p 8080:8080 -d --name my-app chinnachowdary/project1:1.0.0
+Unable to find image 'chinnachowdary/project1:1.0.0' locally
+1.0.0: Pulling from chinnachowdary/project1
+74ac377868f8: Pulling fs layer
+a182a611d05b: Pulling fs layer
+ad4fe29a3001: Pulling fs layer
+9d52462c5181: Pulling fs layer
+ac04a5bb8dd2: Pulling fs layer
+9477858ddf22: Pulling fs layer
+cc2062ac4c6a: Pulling fs layer
+db5b05abb5fc: Pulling fs layer
+9d52462c5181: Waiting
+ac04a5bb8dd2: Waiting
+9477858ddf22: Waiting
+cc2062ac4c6a: Waiting
+db5b05abb5fc: Waiting
+a182a611d05b: Verifying Checksum
+a182a611d05b: Download complete
+74ac377868f8: Verifying Checksum
+74ac377868f8: Download complete
+9d52462c5181: Verifying Checksum
+9d52462c5181: Download complete
+ac04a5bb8dd2: Verifying Checksum
+ac04a5bb8dd2: Download complete
+9477858ddf22: Verifying Checksum
+9477858ddf22: Download complete
+cc2062ac4c6a: Verifying Checksum
+cc2062ac4c6a: Download complete
+ad4fe29a3001: Verifying Checksum
+ad4fe29a3001: Download complete
+db5b05abb5fc: Verifying Checksum
+db5b05abb5fc: Download complete
+74ac377868f8: Pull complete
+a182a611d05b: Pull complete
+ad4fe29a3001: Pull complete
+9d52462c5181: Pull complete
+ac04a5bb8dd2: Pull complete
+9477858ddf22: Pull complete
+cc2062ac4c6a: Pull complete
+db5b05abb5fc: Pull complete
+Digest: sha256:942b3cd87a825c7c964ca286b8514f1ea3a72fa887f107219edf7f8dceef57d8
+Status: Downloaded newer image for chinnachowdary/project1:1.0.0
+3dffbeb08ab151f28e74e989a0f961cb5385c770e713288138d850f433077e1e
+[Pipeline] }
+$ ssh-agent -k
+unset SSH_AUTH_SOCK;
+unset SSH_AGENT_PID;
+echo Agent pid 19427 killed;
+[ssh-agent] Stopped.
+[Pipeline] // sshagent
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
